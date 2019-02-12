@@ -1197,6 +1197,7 @@
 		options = $.extend({}, _default.searchOptions, options);
 
 		this.clearSearch({ render: false });
+		this.showAll();
 
 		var results = [];
 		if (pattern && pattern.length > 0) {
@@ -1220,6 +1221,11 @@
 			})
 		}
 
+		if( options.hideNotMatching ){
+			console.log("hiding...");
+			this.showFiltered(results);
+		}
+
 		// If revealResults, then render is triggered from revealNode
 		// otherwise we just call render.
 		if (options.revealResults) {
@@ -1234,10 +1240,28 @@
 		return results;
 	};
 
+	Tree.prototype.showFiltered = function(search_results){
+		var found_ids = {};
+		$.each(search_results, function(index, node){
+			found_ids[node.nodeId] = true;
+		});
+
+		console.log( search_results)
+		console.log( this.nodes );
+		var tree = this;
+
+		$.each(this.nodes, function(index, node){
+			if( !found_ids[node.nodeId] && !node.nodes ){
+				tree.hideNode(node);
+			}
+		});
+	};
+
 	/**
 		Clears previous search results
 	*/
 	Tree.prototype.clearSearch = function (options) {
+		this.showAll();
 
 		options = $.extend({}, { render: true }, options);
 
@@ -1337,4 +1361,5 @@
 	};
 
 })(jQuery, window, document);
+
 
